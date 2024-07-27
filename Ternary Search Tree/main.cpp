@@ -17,7 +17,7 @@ int main()
 		dictionary.insert(words[i], definitions[i]);
 	}
 	// Test search
-	std::vector<Node*> result = dictionary.search("or");
+	std::vector<Node*> result = dictionary.search("w");
 	for (Node* node : result)
 	{
 		std::cout << *node->data << std::endl;

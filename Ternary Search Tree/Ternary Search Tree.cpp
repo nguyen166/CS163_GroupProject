@@ -115,8 +115,14 @@ void TST::insert(std::string key, std::string data)
 	t->data = new std::string(key + ": " + data);
 	t->isEOS = true;
 
-	if (z == t) return;
-	
+	if (z == t)
+	{
+		z->left = this->nil;
+		z->right = this->nil;
+		z->middle = this->nil;
+		z->color = BLACK;
+		return;
+	}
 	if (z != z->parent->middle)
 	{
 		z->color = RED;
