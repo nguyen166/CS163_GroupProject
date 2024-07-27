@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include<iostream>
 
 #include "Ternary Search Tree.h"
 
@@ -410,6 +411,7 @@ Node* TST::left_rotate(Node*& r, Node* x)
 		y->left->parent = x;
 	}
 	y->parent = x->parent;
+	std::cout << "y: " << y->character << " " << y->parent->character << "\n";
 	if (x->parent == this->nil)
 	{
 		r = y;
@@ -476,8 +478,7 @@ Node* TST::insert_fixup(Node* r, Node*& z)
 				}
 				z->parent->color = BLACK;
 				z->parent->parent->color = RED;
-				Node* temp = z->parent->parent;
-				z->parent->parent = right_rotate(r, z->parent->parent);
+				z->parent->parent = right_rotate(r, z->parent->parent)->parent;
 
 			}
 		}
@@ -500,7 +501,9 @@ Node* TST::insert_fixup(Node* r, Node*& z)
 				}
 				z->parent->color = BLACK;
 				z->parent->parent->color = RED;
-				z->parent->parent = left_rotate(r, z->parent->parent);
+				std::cout << "z: " << z->character << " " << z->parent->character << " " << z->parent->parent->character << "\n";
+				z->parent->parent = left_rotate(r, z->parent->parent)->parent;
+				std::cout << "z: " << z->character << " "<<z->parent->character<<" "<<z->parent->parent->character<<"\n";
 			}
 		}
 	}
