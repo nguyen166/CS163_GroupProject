@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
-#include<iostream>
 
 #include "Ternary Search Tree.h"
 
@@ -62,7 +61,7 @@ void TST::insert(std::string key, std::string data)
 			{
 				if (x->isEOS)
 				{
-					*x->data += ' ' + key + ": " + data;
+					*x->data += " | " + data;
 				}
 				else
 				{
@@ -114,8 +113,7 @@ void TST::insert(std::string key, std::string data)
 	t->data = new std::string(key + ": " + data);
 	t->isEOS = true;
 
-	if (z == t)
-	{
+	if (z == t) {
 		z->left = this->nil;
 		z->right = this->nil;
 		z->middle = this->nil;
@@ -207,18 +205,23 @@ std::vector<Node*> TST::search(std::string prefix) const
 
 void TST::remove(std::string key)
 {
-	Node* z = this->root;
-	// Find z
+	Node* x = this->root;
+	Node* y = this->nil;
 	size_t i = 0;
-	while (z != this->nil && i < key.size())
+	while (i < key.size())
 	{
-		if (key[i] < z->character)
+		if (x == this->nil)
 		{
-			z = z->left;
+			return;
 		}
-		else if (key[i] > z->character)
+		y = x;
+		if (key[i] < x->character)
 		{
-			z = z->right;
+			x = x->left;
+		}
+		else if (key[i] > x->character)
+		{
+			x = x->right;
 		}
 		else
 		{
@@ -226,8 +229,149 @@ void TST::remove(std::string key)
 			{
 				break;
 			}
-			z = z->middle;
+			x = x->middle;
 			i++;
+		}
+	}
+	if (x == this->nil)
+	{
+		return;
+	}
+	if (x->isEOS)
+	{
+		delete x->data;
+		x->isEOS = false;
+	}
+	if (x->left != this->nil && x->middle != this->nil && x->right != this->nil)
+	{
+		x->isEOS = false;
+		return;
+	}
+	if (x->left == this->nil && x->middle == this->nil && x->right == this->nil)
+	{
+		if (y == this->nil)
+		{
+			this->root = this->nil;
+		}
+		else if (y->left == x)
+		{
+			y->left = this->nil;
+		}
+		else if (y->middle == x)
+		{
+			y->middle = this->nil;
+		}
+		else
+		{
+			y->right = this->nil;
+		}
+		delete x;
+	}
+	else if (x->left == this->nil && x->middle == this->nil)
+	{
+		if (y == this->nil)
+		{
+			this->root = x->right;
+		}
+		else if (y->left == x)
+		{
+			y->left = x->right;
+		}
+		else if (y->middle == x)
+		{
+			y->middle = x->right;
+		}
+		else
+		{
+			y->right = x->right;
+		}
+		delete x;
+	}
+	else if (x->middle == this->nil && x->right == this->nil)
+	{
+		if (y == this->nil)
+		{
+			this->root = x->left;
+		}
+		else if (y->left == x)
+		{
+			y->left = x->left;
+		}
+		else if (y->middle == x)
+		{
+			y->middle = x->left;
+		}
+		else
+		{
+			y->right = x->left;
+		}
+		delete x;
+	}
+	else if (x->left == this->nil && x->right == this->nil)
+	{
+		if (y == this->nil)
+		{
+			this->root = x->middle;
+		}
+		else if (y->left == x)
+		{
+			y->left = x->middle;
+		}
+		else if (y->middle == x)
+		{
+			y->middle = x->middle;
+		}
+		else
+		{
+			y->right = x->middle;
+		}
+		delete x;
+	}
+	else if (x->left == this->nil)
+	{
+		Node* z = x->right;
+		while (z->left != this->nil)
+		{
+			z = z->left;
+		}
+		x->character = z->character;
+		x->data = z->data;
+		if (z->isEOS)
+		{
+			x->isEOS = true;
+			z->isEOS = false;
+		}
+		if (z->right != this->nil)
+		{
+			z->right->parent = z->parent;
+		}
+		if (z->parent->left == z)
+		{
+			z->parent->left = z->right;
+		}
+		else if (z->parent->middle == z)
+		{
+			z->parent->middle = z->right;
+		}
+		else
+		{
+			z->parent->right = z->right;
+		}
+		delete z;
+	}
+	else
+	{
+		Node* z = x->left;
+		while (z->right != this->nil)
+		{
+			z = z->right;
+		}
+		x->character = z->character;
+		x->data = z->data;
+		if (z->isEOS)
+		{
+			x->isEOS = true;
+			z->isEOS = false;
 		}
 	}
 }
@@ -244,12 +388,23 @@ void TST::readCSV(const std::string& filename)
 	{
 		if (line.empty())
 			continue;
+		// Ignore characters at the beginning of the line that are not in the alphabet
+		size_t j = 0;
+		while (j < line.size() && !isalpha(line[j]))
+		{
+			j++;
+		}
+		line = line.substr(j);
 		std::string key;
 		std::string data;
 		size_t i = 0;
 		while (i < line.size() && line[i] != ' ')
 		{
-			key.push_back(line[i]);
+			if (i == 0)
+			{
+				key.push_back(tolower(line[i]));
+			}
+			else key.push_back(line[i]);
 			i++;
 		}
 		i++;
@@ -263,7 +418,7 @@ void TST::readCSV(const std::string& filename)
 	fin.close();
 }
 
-Node* TST::left_rotate(Node*& r, Node* x)
+void TST::left_rotate(Node*& r, Node* x)
 {
 	Node* y = x->right;
 	x->right = y->left;
@@ -272,7 +427,6 @@ Node* TST::left_rotate(Node*& r, Node* x)
 		y->left->parent = x;
 	}
 	y->parent = x->parent;
-	std::cout << "y: " << y->character << " " << y->parent->character << "\n";
 	if (x->parent == this->nil)
 	{
 		r = y;
@@ -287,10 +441,9 @@ Node* TST::left_rotate(Node*& r, Node* x)
 	}
 	y->left = x;
 	x->parent = y;
-	return y;
 }
 
-Node* TST::right_rotate(Node*& r, Node* x)
+void TST::right_rotate(Node*& r, Node* x)
 {
 	Node* y = x->left;
 	x->left = y->right;
@@ -313,10 +466,9 @@ Node* TST::right_rotate(Node*& r, Node* x)
 	}
 	y->right = x;
 	x->parent = y;
-	return y;
 }
 
-Node* TST::insert_fixup(Node* r, Node*& z)
+Node* TST::insert_fixup(Node* r, Node* z)
 {
 	while (z->parent->color == RED)
 	{
@@ -335,11 +487,13 @@ Node* TST::insert_fixup(Node* r, Node*& z)
 				if (z == z->parent->right)
 				{
 					z = z->parent;
-					z = left_rotate(r, z)->left;
+					left_rotate(r, z);
 				}
 				z->parent->color = BLACK;
 				z->parent->parent->color = RED;
-				z->parent->parent = right_rotate(r, z->parent->parent)->parent;
+				Node* temp = z->parent->parent;
+				right_rotate(r, z->parent->parent);
+
 			}
 		}
 		else
@@ -357,11 +511,11 @@ Node* TST::insert_fixup(Node* r, Node*& z)
 				if (z == z->parent->left)
 				{
 					z = z->parent;
-					z = right_rotate(r, z)->right;
+					right_rotate(r, z);
 				}
 				z->parent->color = BLACK;
 				z->parent->parent->color = RED;
-				z->parent->parent = left_rotate(r, z->parent->parent)->parent;
+				left_rotate(r, z->parent->parent);
 			}
 		}
 	}
@@ -401,7 +555,7 @@ Node* TST::remove_fixup(Node*& r, Node*& x)
 			{
 				w->color = BLACK;
 				x->parent->color = RED;
-				x->parent = left_rotate(r, x->parent)->left;
+				left_rotate(r, x->parent);
 				w = x->parent->right;
 			}
 			if (w->left->color == BLACK && w->right->color == BLACK)
@@ -415,13 +569,13 @@ Node* TST::remove_fixup(Node*& r, Node*& x)
 				{
 					w->left->color = BLACK;
 					w->color = RED;
-					w = right_rotate(r, w)->right;
+					right_rotate(r, w);
 					w = x->parent->right;
 				}
 				w->color = x->parent->color;
 				x->parent->color = BLACK;
 				w->right->color = BLACK;
-				x->parent = left_rotate(r, x->parent)->left;
+				left_rotate(r, x->parent);
 				x = r;
 			}
 		}
@@ -432,7 +586,7 @@ Node* TST::remove_fixup(Node*& r, Node*& x)
 			{
 				w->color = BLACK;
 				x->parent->color = RED;
-				x->parent = right_rotate(r, x->parent)->right;
+				right_rotate(r, x->parent);
 				w = x->parent->left;
 			}
 			if (w->right->color == BLACK && w->left->color == BLACK)
@@ -446,13 +600,13 @@ Node* TST::remove_fixup(Node*& r, Node*& x)
 				{
 					w->right->color = BLACK;
 					w->color = RED;
-					w = left_rotate(r, w)->left;
+					left_rotate(r, w);
 					w = x->parent->left;
 				}
 				w->color = x->parent->color;
 				x->parent->color = BLACK;
 				w->left->color = BLACK;
-				x->parent = right_rotate(r, x->parent)->right;
+				right_rotate(r, x->parent);
 				x = r;
 			}
 		}
