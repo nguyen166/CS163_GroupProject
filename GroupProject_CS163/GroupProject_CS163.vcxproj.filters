@@ -18,12 +18,18 @@
     <ClInclude Include="TernarySearchTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SuffixArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TernarySearchTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SuffixArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
