@@ -37,27 +37,42 @@ int main() {
 	std::string search_word;
 
 	while (true) {
-		std::cout << "Enter a word to search: ";
-		std::cin >> search_word;
-		if (search_word == "exit") {
-			break;
-		}
-		std::vector<std::string> meaning = tst.search(search_word);
-		if (meaning.empty()) {
-			std::cout << "Did you mean: \n";
-			//std::vector<std::string> suggestions = spellChecking(tst, search_word, 2);
-			std::vector<std::string> suggestions = tst.searchPrefix(search_word);
-			for (const auto& s : suggestions) {
-				std::cout << s << " \n";
+		int choice;
+		cout << "Enter your choice: " << endl;
+		cout << "1- Search Word" << endl;
+		cout << "2- Search Definition" << endl;
+		cout << "3- Random Word " << endl;
+		cin >> choice;
+		if (choice == 1) {
+			std::cout << "Enter a word to search: ";
+			std::cin >> search_word;
+			if (search_word == "exit") {
+				break;
 			}
-		}
-		else {
-			std::cout << "Meaning: ";
-			for (const auto& m : meaning) {
-				std::cout << m << " \n";
+			std::vector<std::string> meaning = tst.search(search_word);
+			if (meaning.empty()) {
+				std::cout << "Did you mean: \n";
+				//std::vector<std::string> suggestions = spellChecking(tst, search_word, 2);
+				std::vector<std::string> suggestions = tst.searchPrefix(search_word);
+				for (const auto& s : suggestions) {
+					std::cout << s << " \n";
+				}
 			}
-			std::cout << std::endl;
+			else {
+				std::cout << "Meaning: ";
+				for (const auto& m : meaning) {
+					std::cout << m << " \n";
+				}
+				std::cout << std::endl;//bao
+			}
+		} else if (choice == 2) {
+			//def
 		}
+		else if (choice == 3) {
+			
+		}
+
+		
 	}
 
 	return 0;
