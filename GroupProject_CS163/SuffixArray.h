@@ -5,20 +5,27 @@
 
 #include <string>
 #include <vector>
+
+enum initType { EMPTY, BF, CSV };
+
 class SuffixArray
 {
 public:
-	std::vector<int> SA_;
-	std::vector<int> LCP;
 	std::string text;
+	std::vector<int> SA_;
 	std::vector<int> wordStartIndices;
-	std::vector<int> wordPointers;
+	std::vector<std::string> words;
+	std::vector<int> LCP;
 
-	SuffixArray();
+	SuffixArray(initType type);
 
 	void loadCSV(std::string filename);
-	void search(const std::string& pattern);
-	//std::vector<std::string> search(const std::string& query);
+	std::vector<std::pair<std::string, std::string>> search(const std::string& pattern);
+	void insert (const std::string& word, const std::string& definition);
+	bool remove(const std::string& word);
+	bool update(const std::string& word, const std::string& definition);
+	void saveToBF(const std::string& filename) const;
+	void loadFromBF(const std::string& filename);
 
 private:
 	void makeSuffixArray(const std::vector<int>& s, std::vector<int>& SA, int n, int K);

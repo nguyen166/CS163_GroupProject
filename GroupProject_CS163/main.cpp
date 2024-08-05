@@ -1,5 +1,6 @@
 #include"TernarySearchTree.h"
-
+#include "SuffixArray.h"
+using namespace std;
 
 
 

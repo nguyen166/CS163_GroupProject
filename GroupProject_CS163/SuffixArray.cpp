@@ -11,15 +11,29 @@ std::ofstream fout;
 std::ifstream fin;
 
 
-SuffixArray::SuffixArray()
+SuffixArray::SuffixArray(initType type)
 {
-	std::string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	for (auto c : letters)
+	if (type == EMPTY)
 	{
-		std::string filename = c + std::string(".csv");
-		loadCSV(filename);
+		return;
 	}
 
+	if (type == BF)
+	{
+		loadFromBF("Data_Storage/Eng2Eng/Eng2Eng.bin");
+		return;
+	}
+
+	if (type == CSV)
+	{
+		std::string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		for (auto c : letters)
+		{
+			std::string filename = std::string("Data_Storage/Eng2Eng/") + c + std::string(".csv");
+			loadCSV(filename);
+		}
+	}
+	
 	text.push_back('$');
 	int n = text.length();
 
@@ -81,12 +95,13 @@ void SuffixArray::loadCSV(std::string filename)
 			i++;
 		}
 		wordStartIndices.push_back(text.size());
-		text += definition + ": " + key + "|";
+		words.push_back(key);
+		text += definition + "|";
 	}
 	fin.close();
 }
 
-void SuffixArray::search(const std::string& pattern) {
+std::vector<std::pair<std::string, std::string>> SuffixArray::search(const std::string& pattern) {
 	int n = text.size();
 	int m = pattern.size();
 	std::vector<int> result;
@@ -111,7 +126,7 @@ void SuffixArray::search(const std::string& pattern) {
 		left++;
 	}
 
-
+	std::vector<std::pair<std::string, std::string>> meanings;
 	// Limit the number of results to 10
 	int count = 0;
 
@@ -123,13 +138,172 @@ void SuffixArray::search(const std::string& pattern) {
 		if (wordIndex != -1) {
 			int wordStart = wordStartIndices[wordIndex];
 			int wordEnd = text.find('|', wordStart);
+			std::string key = words[wordIndex];
 			if (wordEnd != std::string::npos) {
 				std::string foundWord = text.substr(wordStart, wordEnd - wordStart);
-				std::cout << foundWord << std::endl;
+				meanings.push_back(make_pair(key, foundWord));
 				count++;
 			}
 		}
 	}
+
+	return meanings;
+}
+
+void SuffixArray::insert(const std::string& word, const std::string& definition)
+{
+	std::string key = word;
+	std::string definition_ = definition;
+	words.push_back(key);
+	// Remove '$' from the end of the text
+	text.pop_back();
+	wordStartIndices.push_back(text.size());
+	text += definition_ + "|";
+	text.push_back('$');
+}
+
+bool SuffixArray::remove(const std::string& word)
+{
+	std::string key = word;
+	int index = -1;
+	for (int i = 0; i < words.size(); i++)
+	{
+		if (words[i] == key)
+		{
+			index = i;
+			break;
+		}
+	}
+	if (index == -1)
+	{
+		return false;
+	}
+	int start = wordStartIndices[index];
+	int end = text.find('|', start);
+	text.erase(start, end - start + 1);
+	words.erase(words.begin() + index);
+	wordStartIndices.erase(wordStartIndices.begin() + index);
+
+	return true;
+}
+
+bool SuffixArray::update(const std::string& word, const std::string& definition)
+{
+	std::string key = word;
+	std::string definition_ = definition;
+	int index = -1;
+	for (int i = 0; i < words.size(); i++)
+	{
+		if (words[i] == key)
+		{
+			index = i;
+			break;
+		}
+	}
+	if (index == -1)
+	{
+		return false;
+	}
+
+	remove(key);
+	insert(key, definition_);
+
+	return true;
+}
+
+void SuffixArray::saveToBF(const std::string& filename) const
+{
+	fout.open(filename, std::ios::binary);
+	if (!fout.is_open())
+	{	
+		std::cout<< "Error opening file";
+		return;
+	}
+	// Serialize the object
+	int textSize = text.size();
+	fout.write(reinterpret_cast<const char*>(&textSize), sizeof(textSize));
+	fout.write((char*)&text[0], text.size());
+	
+	int SASize = SA_.size();
+	fout.write(reinterpret_cast<const char*>(&SASize), sizeof(SASize));
+	fout.write((char*)&SA_[0], SA_.size() * sizeof(int));
+	
+	int wordStartIndicesSize = wordStartIndices.size();
+	fout.write(reinterpret_cast<const char*>(&wordStartIndicesSize), sizeof(wordStartIndicesSize));
+	fout.write((char*)&wordStartIndices[0], wordStartIndices.size() * sizeof(int));
+	
+	int wordsSize = words.size();
+	fout.write(reinterpret_cast<const char*>(&wordsSize), sizeof(wordsSize));
+	fout.write((char*)&words[0], words.size());
+
+	int LCPSize = LCP.size();
+	fout.write(reinterpret_cast<const char*>(&LCPSize), sizeof(LCPSize));
+	fout.write((char*)&LCP[0], LCP.size() * sizeof(int));
+
+	fout.close();
+}
+
+void SuffixArray::loadFromBF(const std::string& filename)
+{
+	fin.open(filename, std::ios::binary);
+	if (!fin.is_open())
+	{
+		std::cout << "Error opening file";
+		return;
+	}
+	// Deserialize the object
+	int textSize;
+	fin.read(reinterpret_cast<char*>(&textSize), sizeof(textSize));
+	text.resize(textSize);
+	fin.read(&text[0], textSize);
+
+	int SASize;
+	fin.read(reinterpret_cast<char*>(&SASize), sizeof(SASize));
+	SA_.resize(SASize);
+	fin.read((char*)&SA_[0], SASize * sizeof(int));
+
+	int wordStartIndicesSize;
+	fin.read(reinterpret_cast<char*>(&wordStartIndicesSize), sizeof(wordStartIndicesSize));
+	wordStartIndices.resize(wordStartIndicesSize);
+	fin.read((char*)&wordStartIndices[0], wordStartIndicesSize * sizeof(int));
+
+	int wordsSize;
+	fin.read(reinterpret_cast<char*>(&wordsSize), sizeof(wordsSize));
+	words.resize(wordsSize);
+	fin.read((char*)&words[0], wordsSize);
+
+	fin.close();
+}
+
+void SuffixArray::end(bool isModified)
+{
+	if (isModified)
+	{
+		int n = text.length();
+
+		std::vector<int> s(n + 3);
+		std::vector<int> SA(n + 3);
+
+		for (int i = 0; i < n; ++i)
+		{
+			s[i] = (unsigned char)text[i];
+		}
+		
+		SA_.resize(n + 3);
+
+		makeSuffixArray(s, SA, n, 256);
+
+		for (int i = 0; i < SA_.size(); i++)
+		{
+			SA_[i] = SA[i];
+		}
+
+		LCP.clear();
+		LCP.resize(n + 3);
+
+		makeLCPArray(s, SA_, LCP);
+	}
+	saveToBF("Data_Storage/Eng2Eng/Eng2Eng.bin");
 }
 
 void SuffixArray::makeSuffixArray(const std::vector<int>& s, std::vector<int>& SA, int n, int K)
