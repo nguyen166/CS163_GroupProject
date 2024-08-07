@@ -127,11 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FavouriteWord.cpp" />
     <ClCompile Include="History.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Word.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FavouriteWord.h" />
     <ClInclude Include="History.h" />
     <ClInclude Include="Word.h" />
   </ItemGroup>
