@@ -9,7 +9,7 @@
 #include <sstream>
 #include <algorithm>
 #include <memory>
-
+#include "History.h"
 struct TrieNode {
     std::unordered_map<char, std::unique_ptr<TrieNode>> children;
     std::vector<std::string> definitions;
@@ -105,7 +105,7 @@ Trie loadDictionary(const std::string& filename) {
     return trie;
 }
 
-class Word {
+/*class Word {
 private:
     std::string word;
     std::string Searchtime;
@@ -138,9 +138,9 @@ public:
     void setWord(const std::string& text) { word = text; }
     void setDate(const std::string& date) { Searchdate = date; }
     void setTime(const std::string& time) { Searchtime = time; }
-};
+};*/
 
-class History {
+/*class History {
 private:
     std::vector<Word> v;
 
@@ -187,7 +187,79 @@ public:
             std::cout << c.getSearchdate() << " " << c.getSearchtime() << " " << c.getWord() << std::endl;
         }
     }
+};*/
+
+
+
+
+
+class Definition {
+private:
+    std::string content;
+    std::vector<std::string> each;
+    std::vector<std::string> result;
+
+public:
+    Definition(std::string& content) {
+        std::stringstream ss(content);
+        std::string word;
+        while (ss >> word) {
+            each.push_back(word);
+        }
+    }
+
+    void searchByDefinition() {
+        for (char c = 'A'; c <= 'Z'; ++c) {
+            std::ifstream file("DataSet/" + std::string(1, c) + ".txt");
+            if (!file.is_open()) continue;
+
+            std::string line;
+            while (std::getline(file, line)) {
+                std::vector<std::string> wordsInLine = splitIntoWords(line);
+                if (containsAllWords(wordsInLine)) {
+                    result.push_back(line);
+                    if (result.size() == 10) return;
+                }
+            }
+        }
+    }
+
+    void Show() {
+        if (result.empty()) {
+            std::cout << "No word matches" << std::endl;
+        }
+        else {
+            for (auto& line : result) {
+                std::cout <<"-"<< line << std::endl;
+            }
+        }
+    }
+
+private:
+    std::vector<std::string> splitIntoWords(std::string& line) {
+        std::vector<std::string> words;
+        std::stringstream ss(line);
+        std::string word;
+        while (ss >> word) {
+            words.push_back(word);
+        }
+        return words;
+    }
+
+    bool containsAllWords(std::vector<std::string>& wordsInLine) {
+        for (auto& word : each) {
+            if (std::find(wordsInLine.begin(), wordsInLine.end(), word) == wordsInLine.end()) {
+                return false;
+            }
+        }
+        return true;
+    }
 };
+
+
+
+
+
 
 int main() {
     std::string choice;
@@ -199,7 +271,8 @@ int main() {
         std::cout << "1. Search for a word\n";
         std::cout << "2. Search for words with a prefix\n";
         std::cout << "3. History\n";
-        std::cout << "4. Exit\n";
+        std::cout << "4. Search by definition\n";
+        std::cout << "5. Exit\n";
         std::cout << "Enter your choice: ";
         std::cin >> choice;
 
@@ -243,11 +316,20 @@ int main() {
             history.loadHistory();
             history.Show();
         }
-        else if (choice != "4") {
+        else if (choice == "4") {
+            std::cin.ignore();
+            std::string input;
+            std::cout << "Enter definition:";
+            getline(std::cin, input);
+            Definition def(input);
+            def.searchByDefinition();
+            def.Show();
+        }
+        else if (choice != "5") {
             std::cout << "Invalid choice. Please try again.\n";
         }
 
-    } while (choice != "4");
+    } while (choice != "5");
 
     std::cout << "Exiting the dictionary. Goodbye!\n";
     return 0;
