@@ -44,6 +44,10 @@ private:
     TSTNode* _remove(TSTNode* node, const std::string& word, int index);
     TSTNode* _searchPrefix(TSTNode* node, std::string prefix, int indexx);
     void _collect(TSTNode* node, std::string prefix, std::vector<std::string>& result);
+
+	int LevenshteinDistance(const std::string& s1, const std::string& s2);
+    void suggestCorrectionsUtil(TSTNode* node, const std::string& prefix, const std::string& target,std::vector<std::string>& result, int maxDistance);
+
 public:
     
     TST() : root(nullptr) {
@@ -56,11 +60,9 @@ public:
     void loadCSV(const std::string& filename);
 	void remove(const std::string& word);
 	std::vector<std::string> searchPrefix(const std::string& prefix);
-   
+    std::vector<std::string> suggestCorrections(const std::string& word, int maxDistance);
 	
 
 };
-std::vector<std::string> spellChecking(TST& dictionary, const std::string& text, int max_wrong_char);
-void dfs(TSTNode* node, std::string& currentWord, int index, int modifications, const std::string& text, int max_wrong_char, std::vector<std::string>& result);
 
 #endif // !TERNARYSEARCHTREE_H

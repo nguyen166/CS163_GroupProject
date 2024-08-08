@@ -53,8 +53,12 @@ int main() {
 			std::vector<std::string> meaning = tst.search(search_word);
 			if (meaning.empty()) {
 				std::cout << "Did you mean: \n";
-				//std::vector<std::string> suggestions = spellChecking(tst, search_word, 2);
-				std::vector<std::string> suggestions = tst.searchPrefix(search_word);
+				
+				/*std::vector<std::string> suggestions = tst.searchPrefix(search_word);
+				for (const auto& s : suggestions) {
+					std::cout << s << " \n";
+				}*/
+				std::vector<std::string> suggestions = tst.suggestCorrections(search_word, 2);
 				for (const auto& s : suggestions) {
 					std::cout << s << " \n";
 				}

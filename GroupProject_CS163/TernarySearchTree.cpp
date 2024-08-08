@@ -222,51 +222,50 @@ std::vector<std::string> TST::searchPrefix(const std::string& prefix)
 	return result;
 }
 
-std::vector<std::string> spellChecking(TST& dictionary, const std::string& text, int max_wrong_char)
-{
-    std::vector<std::string> result;
 
-    // Start the DFS from the root node
-    std::string currentWord;
-    dfs(dictionary.getRoot(), currentWord, 0, 0, text, max_wrong_char, result);
-
-    return result;
-}
-
-void dfs(TSTNode* node, std::string& currentWord, int index, int modifications, const std::string& text, int max_wrong_char, std::vector<std::string>& result)
-{
-    if (!node || modifications > max_wrong_char) return;
-
-    char currentChar = text[index];
-
-    // Traverse the left child
-    dfs(node->left, currentWord, index, modifications, text, max_wrong_char, result);
-
-    // Check the middle child (current character)
-    if (index < text.size()) {
-        // If characters match
-        if (node->key == currentChar) {
-            currentWord.push_back(node->key);
-            if (node->is_end_of_string && index == text.size() - 1) {
-				result.push_back(currentWord);
+int TST::LevenshteinDistance(const std::string& s1, const std::string& s2) {
+    int m = s1.size();
+    int n = s2.size();
+    std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1));
+    
+    for (int i = 0; i <= m; ++i) {
+        for (int j = 0; j <= n; ++j) {
+            if (i == 0) {
+                dp[i][j] = j;
             }
-            dfs(node->middle, currentWord, index + 1, modifications, text, max_wrong_char, result);
-            currentWord.pop_back();
-        }
-        else {
-            // If characters do not match
-            currentWord.push_back(node->key);
-            dfs(node->middle, currentWord, index + 1, modifications + 1, text, max_wrong_char, result);  // Substitute
-            currentWord.pop_back();
-
-            // Insertion and Deletion
-            dfs(node, currentWord, index + 1, modifications + 1, text, max_wrong_char, result);  // Deletion
-            currentWord.push_back(currentChar);
-            dfs(node->middle, currentWord, index, modifications + 1, text, max_wrong_char, result);  // Insertion
-            currentWord.pop_back();
+            else if (j == 0) {
+                dp[i][j] = i;
+            }
+            else if (s1[i - 1] == s2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            }
+            else {
+                dp[i][j] = 1 + std::min({ dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1] });
+            }
         }
     }
+    
+    return dp[m][n];
+}
 
-    // Traverse the right child
-    dfs(node->right, currentWord, index, modifications, text, max_wrong_char, result);
+void TST::suggestCorrectionsUtil(TSTNode* node, const std::string& prefix, const std::string& target,std::vector<std::string>& result, int maxDistance) {
+    if (node == nullptr) return;
+    
+    suggestCorrectionsUtil(node->left, prefix, target, result, maxDistance);
+    
+    std::string newPrefix = prefix + node->key;
+    if (node->is_end_of_string) {
+        int distance = LevenshteinDistance(newPrefix, target);
+        if (distance <= maxDistance) {
+            result.emplace_back(newPrefix);
+        }
+    }
+    
+    suggestCorrectionsUtil(node->middle, newPrefix, target, result, maxDistance);
+    suggestCorrectionsUtil(node->right, prefix, target, result, maxDistance);
+}
+std::vector<std::string> TST::suggestCorrections(const std::string& word, int maxDistance) {
+    std::vector<std::string> result;
+    suggestCorrectionsUtil(root, "", word, result, maxDistance);
+    return result;
 }
