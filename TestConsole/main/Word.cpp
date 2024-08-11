@@ -1,7 +1,6 @@
 #include "Word.h"
 
-Word::Word(const std::string& text) {
-    word = text;
+Word::Word(const std::string& text) : word(text) {
     std::time_t t = std::time(nullptr);
     std::tm now;
     localtime_s(&now, &t);
@@ -19,34 +18,32 @@ Word::Word(const std::string& text) {
     searchDate = dateStream.str();
 }
 
-std::string Word::getSearchtime() const { return searchTime; }
-std::string Word::getSearchdate() const { return searchDate; }
 std::string Word::getWord() const { return word; }
+void Word::setWord(const std::string& w) { word = w; }
 
-void Word::setWord(const std::string& text) { word = text; }
-void Word::setDate(const std::string& date) { searchDate = date; }
+std::string Word::getSearchtime() const { return searchTime; }
 void Word::setTime(const std::string& time) { searchTime = time; }
 
-std::ofstream& operator<<(std::ofstream& os, const Word& w) {
+std::string Word::getSearchdate() const { return searchDate; }
+void Word::setDate(const std::string& date) { searchDate = date; }
+
+void Word::writeToStream(std::ofstream& os) const {
     size_t size;
 
-    size = w.word.size();
+    size = word.size();
     os.write(reinterpret_cast<const char*>(&size), sizeof(size));
-    os.write(w.word.c_str(), size);
+    os.write(word.c_str(), size);
 
-    size = w.searchTime.size();
+    size = searchTime.size();
     os.write(reinterpret_cast<const char*>(&size), sizeof(size));
-    os.write(w.searchTime.c_str(), size);
+    os.write(searchTime.c_str(), size);
 
-    size = w.searchDate.size();
+    size = searchDate.size();
     os.write(reinterpret_cast<const char*>(&size), sizeof(size));
-    os.write(w.searchDate.c_str(), size);
-
-    return os;
+    os.write(searchDate.c_str(), size);
 }
 
-
-std::ifstream& operator>>(std::ifstream& is, Word& w) {
+void Word::readFromStream(std::ifstream& is) {
     size_t size;
     std::vector<char> buffer;
 
@@ -54,19 +51,17 @@ std::ifstream& operator>>(std::ifstream& is, Word& w) {
     is.read(reinterpret_cast<char*>(&size), sizeof(size));
     buffer.resize(size);
     is.read(buffer.data(), size);
-    w.word.assign(buffer.begin(), buffer.end());
+    word.assign(buffer.begin(), buffer.end());
 
     // Read searchTime
     is.read(reinterpret_cast<char*>(&size), sizeof(size));
     buffer.resize(size);
     is.read(buffer.data(), size);
-    w.searchTime.assign(buffer.begin(), buffer.end());
+    searchTime.assign(buffer.begin(), buffer.end());
 
     // Read searchDate
     is.read(reinterpret_cast<char*>(&size), sizeof(size));
     buffer.resize(size);
     is.read(buffer.data(), size);
-    w.searchDate.assign(buffer.begin(), buffer.end());
-
-    return is;
+    searchDate.assign(buffer.begin(), buffer.end());
 }

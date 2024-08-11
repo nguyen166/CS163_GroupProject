@@ -6,6 +6,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+
 class Word {
 private:
     std::string word;
@@ -28,9 +29,6 @@ public:
     void setDate(const std::string& date);
 
     // Serialization and deserialization
-    friend std::ofstream& operator<<(std::ofstream& os, const Word& w);
-    friend std::ifstream& operator>>(std::ifstream& is, Word& w);
+    void writeToStream(std::ofstream& os) const;
+    void readFromStream(std::ifstream& is);
 };
-
-std::ofstream& operator<<(std::ofstream& os, const Word& w);
-std::ifstream& operator>>(std::ifstream& is, Word& w);

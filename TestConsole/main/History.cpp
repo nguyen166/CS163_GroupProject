@@ -9,7 +9,8 @@ void History::loadHistory() {
     }
 
     Word word;
-    while (in >> word) {
+    while (in.peek() != EOF) {
+        word.readFromStream(in);
         v.push_back(word);
     }
 
@@ -23,8 +24,7 @@ void History::saveHistory(const Word& w) {
         return;
     }
 
-    out << w;
-    out.close();
+    w.writeToStream(out);
 }
 
 void History::Show() const {
