@@ -14,11 +14,10 @@ private:
     std::string searchDate;
 
 public:
-    // Constructors
+    
     Word() = default;
     Word(const std::string& text);
 
-    // Getters and setters
     std::string getWord() const;
     void setWord(const std::string& w);
 
@@ -28,7 +27,6 @@ public:
     std::string getSearchdate() const;
     void setDate(const std::string& date);
 
-    // Serialization and deserialization
     void writeToStream(std::ofstream& os) const;
     void readFromStream(std::ifstream& is);
 };
