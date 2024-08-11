@@ -13,6 +13,8 @@ class FavoriteManager {
 public:
     void addFavorite(const std::string& word, const std::vector<std::string>& definitions);
     void saveFavorites(const std::string& filename) const;
+    void loadFavorites(const std::string& filename);
+    void viewFavorites() const;
 };
 
 #endif // FAVORITE_H
