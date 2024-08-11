@@ -1,5 +1,5 @@
 #include"TernarySearchTree.h"
-
+#include"algorithm"
 
 TSTNode* TST::_insert(TSTNode* node, const std::string& word, const std::string& meaning, int index) {
     char char_key = word[index];
@@ -143,7 +143,7 @@ void TST::loadCSV(const std::string& filename) {
             continue;
         // Ignore characters at the beginning of the line that are not in the alphabet
         size_t j = 0;
-        while (j < line.size() && !isalpha(line[j]))
+        if (j < line.size() && line[j]=='"')
         {
             j++;
         }
@@ -151,8 +151,12 @@ void TST::loadCSV(const std::string& filename) {
         std::string key;
         std::string data;
         size_t i = 0;
-        while (i < line.size() && line[i] != ' ')
+        while (i < line.size())
         {
+			if (line[i] == ' ' && line[i+1]=='(')
+            {
+				break;
+			}
             if (i == 0)
             {
                 key.push_back(tolower(line[i]));
@@ -203,7 +207,7 @@ void TST::_collect(TSTNode* node, std::string prefix, std::vector<std::string>& 
 	prefix.push_back(node->key);
 	if (node->is_end_of_string) {
 		for (const auto& m : node->meaning)
-		result.push_back(prefix+node->key+":"+m);
+		result.push_back(prefix+" "+m);
 	}
 	_collect(node->middle, prefix, result);
 	prefix.pop_back();
@@ -268,4 +272,39 @@ std::vector<std::string> TST::suggestCorrections(const std::string& word, int ma
     std::vector<std::string> result;
     suggestCorrectionsUtil(root, "", word, result, maxDistance);
     return result;
+}
+void saveAll2csv(const std::string& pathname, TST* tst) {
+	std::ofstream fout;
+    std::string prefix=" ";
+	for (char c = 'A'; c <= 'Z'; c++) {
+        prefix[0] = tolower(c);
+		std::string filename = pathname + c + ".csv";
+		save2CSV(filename, prefix, fout, tst);
+	}
+}
+
+void save2CSV(const std::string& filename, std::string prefix, std::ofstream& fout, TST* tst) {
+	if (tst->getRoot() == nullptr) {
+		return;
+	}
+	fout.open(filename);
+	if (!fout.is_open())
+    {
+		return;
+	}
+	std::vector<std::string> meaning=tst->search(prefix);
+	for (const auto& m : meaning) {
+		fout << prefix << " " << m << "\n\n";
+	}
+
+	std::vector<std::string> result= tst->searchPrefix(prefix);
+	if (result.empty())
+    {
+		return;
+	}
+	for (const auto& r : result) {
+		fout << r << std::endl<<"\n";
+	}
+	
+	fout.close();
 }

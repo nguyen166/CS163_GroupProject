@@ -127,10 +127,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Favorite.h" />
+    <ClInclude Include="History.h" />
     <ClInclude Include="SuffixArray.h" />
     <ClInclude Include="TernarySearchTree.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Favorite.cpp" />
+    <ClCompile Include="History.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SuffixArray.cpp" />
     <ClCompile Include="TernarySearchTree.cpp" />

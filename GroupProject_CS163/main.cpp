@@ -7,7 +7,9 @@ using namespace std;
 int main() {
 	TST tst;
 
-	tst.loadCSV("Data_Storage/Eng2Eng/A.csv");
+	tst.loadCSV("Data_Storage/Eng2Eng/Origin/A.csv");
+	tst.loadCSV("Data_Storage/Eng2Eng/Origin/B.csv");
+	tst.loadCSV("Data_Storage/Eng2Eng/Origin/C.csv");
 	/*tst.loadCSV("B.csv");
 	tst.loadCSV("C.csv");
 	tst.loadCSV("D.csv");
@@ -36,7 +38,6 @@ int main() {
 
 
 	std::string search_word;
-
 	while (true) {
 		int choice;
 		cout << "Enter your choice: " << endl;
@@ -46,7 +47,9 @@ int main() {
 		cin >> choice;
 		if (choice == 1) {
 			std::cout << "Enter a word to search: ";
-			std::cin >> search_word;
+			cin.ignore();
+			std::getline(std::cin, search_word);
+			search_word[0] = tolower(search_word[0]);
 			if (search_word == "exit") {
 				break;
 			}
@@ -54,14 +57,14 @@ int main() {
 			if (meaning.empty()) {
 				std::cout << "Did you mean: \n";
 				
-				/*std::vector<std::string> suggestions = tst.searchPrefix(search_word);
-				for (const auto& s : suggestions) {
-					std::cout << s << " \n";
-				}*/
-				std::vector<std::string> suggestions = tst.suggestCorrections(search_word, 2);
+				std::vector<std::string> suggestions = tst.searchPrefix(search_word);
 				for (const auto& s : suggestions) {
 					std::cout << s << " \n";
 				}
+				//std::vector<std::string> suggestions = tst.suggestCorrections(search_word, 2);
+				//for (const auto& s : suggestions) {
+					//std::cout << s << " \n";
+				//}
 			}
 			else {
 				std::cout << "Meaning: ";
@@ -79,6 +82,7 @@ int main() {
 
 		
 	}
-
+	
+	saveAll2csv("Data_Storage/Eng2Eng/Current/", &tst);
 	return 0;
 }

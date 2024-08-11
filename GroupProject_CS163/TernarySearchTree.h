@@ -47,7 +47,7 @@ private:
 
 	int LevenshteinDistance(const std::string& s1, const std::string& s2);
     void suggestCorrectionsUtil(TSTNode* node, const std::string& prefix, const std::string& target,std::vector<std::string>& result, int maxDistance);
-
+   
 public:
     
     TST() : root(nullptr) {
@@ -64,5 +64,7 @@ public:
 	
 
 };
+void save2CSV(const std::string& filename, std::string prefix, std::ofstream& fout,TST* tst);
+void saveAll2csv(const std::string& pathname,TST* tst);
 
 #endif // !TERNARYSEARCHTREE_H
