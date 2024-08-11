@@ -4,19 +4,18 @@
 #include <vector>
 #include <fstream>
 #include <string> 
+using namespace std;
 class FavouriteWord
 {
 public:
-    // Add a word to the favourite list
-    void addWord(const std::string& word, std::vector<std::string>& words);
-
-    // Remove a word from the favourite list
-    void removeWord(const std::string& word, std::vector<std::string>& words);
-
-    void displayWords(const std::vector<std::string>& words);
-
-    void saveToFile(const std::string& filename, const std::vector<std::string>& words);
-
-    void loadFromFile(const std::string& filename, std::vector<std::string>& words);
+    void addWord(const string& word, vector<string>& words);
+    // Remove word from a vector
+    void removeWord(const string& word, vector<string>& words);
+    //display word from a vector
+    void displayWords(vector<string>& words);
+    // Save new voc to a file
+    void saveToFile(const string& filename, vector<string>& words);
+    //Load word from a file 
+    void loadFromFile(const string& filename, vector<string>& words);
 };
 

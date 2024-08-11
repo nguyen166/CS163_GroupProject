@@ -1,24 +1,15 @@
 #include "History.h"
+
 void History::loadHistory() {
     v.clear();
-    std::ifstream in("history.csv");
-    std::string line;
-    getline(in, line);
+    std::ifstream in("history.bin", std::ios::binary);
+    if (!in.is_open()) {
+        std::cerr << "Error opening file for reading." << std::endl;
+        return;
+    }
 
-    while (getline(in, line)) {
-        Word word;
-        std::stringstream ss(line);
-        std::string temp;
-
-        getline(ss, temp, ',');
-        word.setWord(temp);
-
-        getline(ss, temp, ',');
-        word.setTime(temp);
-
-        getline(ss, temp, ',');
-        word.setDate(temp);
-
+    Word word;
+    while (in >> word) {
         v.push_back(word);
     }
 
@@ -26,9 +17,13 @@ void History::loadHistory() {
 }
 
 void History::saveHistory(const Word& w) {
-    std::ofstream out("history.csv", std::ios::app);
-    if (!out.is_open()) return;
-    out << w.getWord() << "," << w.getSearchtime() << "," << w.getSearchdate() << std::endl;
+    std::ofstream out("history.bin", std::ios::binary | std::ios::app);
+    if (!out.is_open()) {
+        std::cerr << "Error opening file for writing." << std::endl;
+        return;
+    }
+
+    out << w;
     out.close();
 }
 
