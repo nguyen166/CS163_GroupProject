@@ -78,6 +78,7 @@ std::vector<std::string> TST::_search(TSTNode* node, const std::string& word, in
             if (node->is_end_of_string) {
                 return node->meaning;
             }
+            else return {};
         }
         return _search(node->middle, word, index + 1);
     }

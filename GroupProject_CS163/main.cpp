@@ -1,5 +1,6 @@
 #include"TernarySearchTree.h"
 #include "SuffixArray.h"
+#include <fstream>
 using namespace std;
 
 
@@ -7,82 +8,58 @@ using namespace std;
 int main() {
 	TST tst;
 
-	tst.loadCSV("Data_Storage/Eng2Eng/Origin/A.csv");
-	tst.loadCSV("Data_Storage/Eng2Eng/Origin/B.csv");
-	tst.loadCSV("Data_Storage/Eng2Eng/Origin/C.csv");
-	/*tst.loadCSV("B.csv");
-	tst.loadCSV("C.csv");
-	tst.loadCSV("D.csv");
-	tst.loadCSV("E.csv");
-	tst.loadCSV("F.csv");
-	tst.loadCSV("G.csv");
-	tst.loadCSV("H.csv");
-	tst.loadCSV("I.csv");
-	tst.loadCSV("J.csv");
-	tst.loadCSV("K.csv");
-	tst.loadCSV("L.csv");
-	tst.loadCSV("M.csv");
-	tst.loadCSV("N.csv");
-	tst.loadCSV("O.csv");
-	tst.loadCSV("P.csv");
-	tst.loadCSV("Q.csv");
-	tst.loadCSV("R.csv");
-	tst.loadCSV("S.csv");
-	tst.loadCSV("T.csv");
-	tst.loadCSV("U.csv");
-	tst.loadCSV("V.csv");
-	tst.loadCSV("W.csv");
-	tst.loadCSV("X.csv");
-	tst.loadCSV("Y.csv");
-	tst.loadCSV("Z.csv");*/
-
-
-	std::string search_word;
-	while (true) {
-		int choice;
-		cout << "Enter your choice: " << endl;
-		cout << "1- Search Word" << endl;
-		cout << "2- Search Definition" << endl;
-		cout << "3- Random Word " << endl;
-		cin >> choice;
-		if (choice == 1) {
-			std::cout << "Enter a word to search: ";
-			cin.ignore();
-			std::getline(std::cin, search_word);
-			search_word[0] = tolower(search_word[0]);
-			if (search_word == "exit") {
-				break;
-			}
-			std::vector<std::string> meaning = tst.search(search_word);
-			if (meaning.empty()) {
-				std::cout << "Did you mean: \n";
-				
-				std::vector<std::string> suggestions = tst.searchPrefix(search_word);
-				for (const auto& s : suggestions) {
-					std::cout << s << " \n";
-				}
-				//std::vector<std::string> suggestions = tst.suggestCorrections(search_word, 2);
-				//for (const auto& s : suggestions) {
-					//std::cout << s << " \n";
-				//}
-			}
-			else {
-				std::cout << "Meaning: ";
-				for (const auto& m : meaning) {
-					std::cout << m << " \n";
-				}
-				std::cout << std::endl;//bao
-			}
-		} else if (choice == 2) {
-			//def
-		}
-		else if (choice == 3) {
-			
-		}
-
-		
+	for (char c = 'A'; c <= 'Z'; c++) {
+		string s = "Data_Storage/Eng2Eng/Origin/";
+		s += c;
+		s += ".csv";
+		tst.loadCSV(s);
 	}
+	ifstream fin;
+	ofstream fout;
+
+	fin.open("Data_Storage/Eng2Eng/Games/Words/EasyMode.txt");
+	fout.open("Data_Storage/Eng2Eng/Games/Definitions/HardMode.txt");
 	
-	saveAll2csv("Data_Storage/Eng2Eng/Current/", &tst);
+	string word;
+	// Read text file, each line is one word
+	while (getline(fin, word))
+	{
+		vector<string> defs;
+		defs = tst.search(word);
+		if (defs.size() != 0) {
+			fout << defs[0] << endl;
+			cout << word << endl;
+		}
+	}
+	fin.close();
+
+	fin.open("Data_Storage/Eng2Eng/Games/Words/MediumMode.txt");
+	// Read text file, each line is one word
+	while (getline(fin, word))
+	{
+		vector<string> defs;
+		defs = tst.search(word);
+		if (defs.size() != 0) {
+			fout << defs[0] << endl;
+			cout << word << endl;
+		}
+	}
+	fin.close();
+
+	fin.open("Data_Storage/Eng2Eng/Games/Words/HardMode.txt");
+	// Read text file, each line is one word
+	while (getline(fin, word))
+	{
+		vector<string> defs;
+		defs = tst.search(word);
+		if (defs.size() != 0) {
+			fout << defs[0] << endl;
+			cout << word << endl;
+		}
+	}
+	fin.close();
+	fout.close();
+
+
 	return 0;
 }

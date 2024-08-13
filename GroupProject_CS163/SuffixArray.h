@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+enum dictType { EE, EV, VE, SL, EM };
 enum initType { EMPTY, BF, CSV };
 
 class SuffixArray
@@ -17,7 +18,7 @@ public:
 	std::vector<std::string> words;
 	std::vector<int> LCP;
 
-	SuffixArray(initType type);
+	SuffixArray(initType iType, dictType dType);
 
 	void loadCSV(std::string filename);
 	std::vector<std::pair<std::string, std::string>> search(const std::string& pattern);

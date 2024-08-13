@@ -11,25 +11,25 @@ std::ofstream fout;
 std::ifstream fin;
 
 
-SuffixArray::SuffixArray(initType type)
+SuffixArray::SuffixArray(initType iType, dictType dType)
 {
-	if (type == EMPTY)
+	if (iType == EMPTY)
 	{
 		return;
 	}
 
-	if (type == BF)
+	if (iType == BF)
 	{
-		loadFromBF("Data_Storage/Eng2Eng/Eng2Eng.bin");
+		loadFromBF("Data_Storage/Eng2Eng/Current/Eng2Eng.bin");
 		return;
 	}
 
-	if (type == CSV)
+	if (iType == CSV)
 	{
 		std::string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		for (auto c : letters)
 		{
-			std::string filename = std::string("Data_Storage/Eng2Eng/") + c + std::string(".csv");
+			std::string filename = std::string("Data_Storage/Eng2Eng/Origin/") + c + std::string(".csv");
 			loadCSV(filename);
 		}
 	}
@@ -303,7 +303,7 @@ void SuffixArray::end(bool isModified)
 
 		makeLCPArray(s, SA_, LCP);
 	}
-	saveToBF("Data_Storage/Eng2Eng/Eng2Eng.bin");
+	saveToBF("Data_Storage/Eng2Eng/Current/Eng2Eng.bin");
 }
 
 void SuffixArray::makeSuffixArray(const std::vector<int>& s, std::vector<int>& SA, int n, int K)
